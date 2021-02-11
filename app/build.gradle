@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
+
+
     compileSdkVersion 29
 
     defaultConfig {
@@ -16,8 +18,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.github.saasquatch:SquatchAndroid:c54279f'
+    implementation 'com.github.saasquatch:saasquatch-java-sdk:8e2b27b'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.10'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 }
