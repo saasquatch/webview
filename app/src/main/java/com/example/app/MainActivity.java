@@ -1,89 +1,132 @@
 package com.example.app;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-
+import com.saasquatch.android.SquatchAndroid;
 import com.saasquatch.android.SquatchJavascriptInterface;
+import com.saasquatch.android.input.AndroidRenderWidgetOptions;
 import com.saasquatch.sdk.ClientOptions;
+import com.saasquatch.sdk.RequestOptions;
 import com.saasquatch.sdk.SaaSquatchClient;
+import com.saasquatch.sdk.auth.AuthMethod;
 import com.saasquatch.sdk.input.RenderWidgetInput;
 import com.saasquatch.sdk.input.UserIdInput;
-import com.saasquatch.sdk.input.WidgetTypes;
-
+import com.saasquatch.sdk.input.WidgetType;
+import com.saasquatch.sdk.internal.json.GsonUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity {
 
-    private WebView mWebView;
-    private SaaSquatchClient saasquatchClient;
+  static final String tenantAlias = "test_anflbjnde3o91",
+  accountId = "GRMOA4D5UHT482FF", userId = "5ef39052e4b0aa52a7b1a852",
+  programId = "r1";
 
-//    @Override
-//    public Context getApplicationContext() {
-//        return super.getApplicationContext();
-//    }
+  private WebView mWebView;
+  private SaaSquatchClient saasquatchClient;
+  private SquatchAndroid squatchAndroid;
 
-    @Override
-    @SuppressLint("SetJavaScriptEnabled")
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        saasquatchClient = SaaSquatchClient.create(ClientOptions.newBuilder()
-                .setAppDomain("staging.referralsaasquatch.com")
-                .setTenantAlias("test_aisnwipcdkk5k")
-                .build());
+  @Override
+  @SuppressLint("SetJavaScriptEnabled")
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    saasquatchClient = SaaSquatchClient.create(ClientOptions.newBuilder()
+        .setAppDomain("staging.referralsaasquatch.com")
+        .setTenantAlias(tenantAlias)
+        .build());
+    this.squatchAndroid = SquatchAndroid.create(saasquatchClient);
 
-        setContentView(R.layout.activity_main);
-        mWebView = findViewById(R.id.activity_main_webview);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-//        mWebView.setWebViewClient(new MyWebViewClient(getBaseContext()));
-//        mWebView.addJavascriptInterface(new WebAppInterface(this), "SquatchAndroid");
-        SquatchJavascriptInterface.applyToWebView(mWebView);
+    setContentView(R.layout.activity_main);
+    mWebView = findViewById(R.id.activity_main_webview);
+    WebSettings webSettings = mWebView.getSettings();
+    webSettings.setJavaScriptEnabled(true);
+    webSettings.setDomStorageEnabled(true);
+    webSettings.setAllowContentAccess(true);
+    webSettings.setAllowFileAccess(true);
+    mWebView.setWebChromeClient(new WebChromeClient());
+//    mWebView.setWebViewClient(new MyWebViewClient());
+    SquatchJavascriptInterface.applyToWebView(mWebView);
+//
+//    Single.fromPublisher(saasquatchClient.renderWidget(RenderWidgetInput.newBuilder()
+//        .setUser(UserIdInput.of("1234", "1234"))
+//        .setEngagementMedium("UNKNOWN")
+//        .setWidgetType(WidgetType.ofProgramWidget("new-schema-test", "referrerWidget"))
+//        .build(), RequestOptions.newBuilder()
+//        .setAuthMethod(AuthMethod.ofTenantApiKey("TEST_1GQihVWTUfncgmzA8Hb6Nike07rZrQke"))
+//        .build()))
+//        .subscribeOn(Schedulers.io())
+//        .observeOn(AndroidSchedulers.mainThread())
+//        .doOnSuccess(apiResponse -> {
+//          final String widgetTemplate = apiResponse.getData();
+//          String encodedHtml = Base64.encodeToString(widgetTemplate.getBytes(UTF_8), Base64.DEFAULT);
+//          mWebView.loadData(encodedHtml, "text/html", "base64");
+////          mWebView.loadDataWithBaseURL("https://staging.referralsaasquatch.com", widgetTemplate, "text/html", null, null);
+//        })
+//        .subscribe();
 
-        Single.fromPublisher(saasquatchClient.renderWidget(RenderWidgetInput.newBuilder()
-//                .setUser(UserIdInput.of("accId", "userId"))
-                .setWidgetType(WidgetTypes.ofProgramWidget("new-schema-test", "referredWidget"))
-                .build(), null))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(apiResponse -> {
-//                    final String widgetTemplate = apiResponse.getData();
-//                    // do whatever you want with it
-//                    System.out.println(widgetTemplate);
-                    String widgetTemplate = "<html> <body> <sqh-global-container background=\"#ffffff\" loadingcolor=\"#439B76\" fontfamily=\"Helvetica Neue,Helvetica,Arial,sans-serif\" poweredby=\"true\"><sqh-image-component ishidden=\"false\" url=\"https://d2rcp9ak152ke1.cloudfront.net/theme/test_azu3qtbbzj0ta/assets/WkKexbBO/images/conversion.png\" alignment=\"center\" width=\"140\" css=\"padding-top: 38px; padding-bottom: 7px;\"></sqh-image-component><sqh-text-component sqhheader=\"true\" ishidden=\"false\" ismarkdown=\"false\" color=\"#000\" fontsize=\"24\" text=\"You were Successfully Referred to Saasquatch\" textalign=\"center\" paddingtop=\"12\" paddingbottom=\"20\"></sqh-text-component><sqh-text-component sqhbody=\"true\" ishidden=\"false\" ismarkdown=\"false\" color=\"gray\" rewardkey=\"referredReward\" fontsize=\"13\" text=\"<hr style='border-top: 1px solid #eee; border-bottom: 0;'></hr><br/><br/>Use the Referral Code at checkout to receive your referral reward\" ismarkdown=\"true\" textalign=\"center\" paddingtop=\"10\" paddingbottom=\"20\"></sqh-text-component><sqh-copy-button ishidden=\"false\" copysuccess=\"copied!\" copyfailure=\"Press Ctrl+C to copy\" codefontcolor=\"#000000\" codefontsize=\"14\" text=\"COPY CODE\" fontsize=\"14\" width=\"170\" backgroundcolor=\"#35b21e\" textcolor=\"#ffffff\" borderradius=\"4\" rewardkey=\"referredReward\" codefontsize=\"14\" codefontcolor=\"#000000\"></sqh-copy-button></sqh-global-container> </body> </html>";
-//                    String widgetTemplate = "<h1>hi</h1>";
-                    String encodedHtml = Base64.encodeToString(widgetTemplate.getBytes(), Base64.NO_PADDING);
-                    mWebView.loadData(encodedHtml, "text/html", "base64");
-//                    mWebView.loadData(widgetTemplate, "text/html", "UTF-8");
-                })
-                .subscribe();
+    Single.fromPublisher(squatchAndroid.renderWidget(RenderWidgetInput.newBuilder()
+        .setUser(UserIdInput.of(accountId, userId))
+        .setEngagementMedium("UNKNOWN")
+        .setWidgetType(WidgetType.ofProgramWidget(programId, "referrerWidget"))
+        .build(), RequestOptions.newBuilder()
+        .setAuthMethod(AuthMethod.ofTenantApiKey("TEST_j5F7WMc3QvZiomD0bo4eXtlePQaBOlVa"))
+        .build(), AndroidRenderWidgetOptions.ofWebView(mWebView)))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .doOnSuccess(apiResponse -> {
+          final String widgetTemplate = apiResponse.getData();
+          String encodedHtml = Base64.encodeToString(widgetTemplate.getBytes(UTF_8), Base64.DEFAULT);
+          mWebView.loadData(encodedHtml, "text/html", "base64");
+        })
+        .toFlowable()
+        .onErrorResumeNext(t -> {
+          t.printStackTrace();
+          return Flowable.empty();
+        })
+        .subscribe();
+  }
 
-        // REMOTE RESOURCE
-//         mWebView.loadUrl("https://app.referralsaasquatch.com/a/test_aw8cmqwv4sy58/widgets/mobilewidget?userId=noahtest&firstName=noah&lastName=testerson&accountId=noahtest&paymentProviderId=NULL&email=noah%40example.com&jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoibm9haHRlc3QiLCJhY2NvdW50SWQiOiJub2FodGVzdCJ9fQ._7dOoIm5YPddKm8zkKGo2XH0J-DQhvowAthvLESNctc");
-//         mWebView.loadData(data, "text/html", "UTF-8");
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    try {
+      saasquatchClient.close();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        saasquatchClient.close();
-    }
-
-    @Override
-    public void onBackPressed() {
-//        if(mWebView.canGoBack()) {
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-        SquatchJavascriptInterface myInterface = SquatchJavascriptInterface.create(getApplicationContext());
-        myInterface.shareOnFacebook("www.google.com", "http://www.google.com");
-    }
+  @Override
+  public void onBackPressed() {
+    SquatchJavascriptInterface myInterface =
+//        SquatchJavascriptInterface
+//        .create(getApplicationContext());
+    SquatchJavascriptInterface.newBuilder()
+        .setSquatchAndroid(squatchAndroid)
+        .setApplicationContext(getApplicationContext())
+        .build();
+    final Map<String, Object> userMap = new HashMap<>();
+    userMap.put("accountId", accountId);
+    userMap.put("id", userId);
+    final Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("user", userMap);
+    paramMap.put("shareLink", "https://example.com");
+    paramMap.put("messageLink", "https://google.com");
+    paramMap.put("tenantAlias", tenantAlias);
+    paramMap.put("programId", programId);
+    myInterface.shareOnFacebook(GsonUtils.gson.toJson(paramMap));
+//    myInterface.shareOnFacebook("www.google.com", "http://www.google.com");
+  }
 }

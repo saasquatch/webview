@@ -3,12 +3,12 @@ apply plugin: 'com.android.application'
 android {
 
 
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.example.app"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
@@ -32,8 +32,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.github.saasquatch:SquatchAndroid:c54279f'
-    implementation 'com.github.saasquatch:saasquatch-java-sdk:8e2b27b'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.10'
+    implementation 'com.github.saasquatch:SquatchAndroid:8a3212d'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.11'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 }

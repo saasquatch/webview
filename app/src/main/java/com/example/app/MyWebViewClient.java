@@ -34,17 +34,17 @@ class MyWebViewClient extends WebViewClient {
 //        return facebookAppFound;
 //    }
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        String hostname;
-
-        // YOUR HOSTNAME
-        hostname = "app.referralsaasquatch.com";
-
-        Uri uri = Uri.parse(url);
-        if (url.startsWith("file:") || uri.getHost() != null && uri.getHost().endsWith(hostname)) {
-            return false;
-        }
+//    @Override
+//    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//        String hostname;
+//
+//        // YOUR HOSTNAME
+//        hostname = "app.referralsaasquatch.com";
+//
+//        Uri uri = Uri.parse(url);
+//        if (url.startsWith("file:") || uri.getHost() != null && uri.getHost().endsWith(hostname)) {
+//            return false;
+//        }
 
 //        if (url.startsWith("http://ssqt.co/")) {
 //            view.loadUrl(url);
@@ -64,8 +64,8 @@ class MyWebViewClient extends WebViewClient {
 //            }
 //        }
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        view.getContext().startActivity(intent);
-        return true;
-    }
+//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//        view.getContext().startActivity(intent);
+//        return true;
+//    }
 }
